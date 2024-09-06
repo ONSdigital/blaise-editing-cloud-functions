@@ -13,5 +13,5 @@ class Config:
         return cls(
             instance_name=os.getenv("INSTANCE_NAME"),
             database_username=os.getenv("DATABASE_USERNAME"),
-            database_password = os.getenv("DATABASE_PASSWORD")
+            database_password=os.getenv("DATABASE_PASSWORD")
         )
