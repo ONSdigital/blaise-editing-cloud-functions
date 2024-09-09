@@ -1,4 +1,4 @@
-from appconfig.config import Config
+from appconfig.sql_configuration import Config
 
 
 def get_default_config() -> Config:

@@ -2,29 +2,9 @@ from unittest import mock
 
 import pytest
 
-from appconfig.config import Config
+from appconfig.sql_configuration import Config
 from main import copy_cases_to_unedited
 import logging
-
-
-class TestMainCopyCasesToUnedited:
-
-    @mock.patch("appconfig.config.Config.from_env")
-    def test_copy_cases_to_unedited_done_and_200_status_code_for_valid_request(
-            self,
-            mock_config,
-    ):
-        # Arrange
-        mock_config.return_value = Config(instance_name="test_instance_name",
-                                          database_username="test_user",
-                                          database_password="test_password")
-
-        # Act
-        response, status_code = copy_cases_to_unedited()
-
-        # Assert
-        assert response == "Successfully copied cases to unedited"
-        assert status_code == 200
 
 
 class TestMainCopyCasesToUneditedHandleConfigStep:

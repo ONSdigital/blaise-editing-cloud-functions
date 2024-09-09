@@ -2,7 +2,7 @@ from contextlib import contextmanager
 
 import pytest
 
-from appconfig.config import Config
+from appconfig.sql_configuration import Config
 from services.validation_service import ValidationService
 from tests.helper import get_default_config
 from utilities.custom_exceptions import (
