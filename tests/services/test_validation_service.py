@@ -2,7 +2,7 @@ from contextlib import contextmanager
 
 import pytest
 
-from appconfig.sql_configuration import Config
+from appconfig.sql_configuration import SqlConfiguration
 from services.validation_service import ValidationService
 from tests.helper import get_default_config
 from utilities.custom_exceptions import (
@@ -11,7 +11,7 @@ from utilities.custom_exceptions import (
 
 
 @pytest.fixture()
-def config() -> Config:
+def config() -> SqlConfiguration:
     return get_default_config()
 
 
@@ -31,9 +31,9 @@ class TestValidateConfig:
     def test_validate_config_does_not_raise_an_exception_when_given_valid_config(self):
         # arrange
         validation_service = ValidationService()
-        mock_config = Config(instance_name="test_instance_name",
-                             database_username="test_user",
-                             database_password="test_password")
+        mock_config = SqlConfiguration(instance_name="test_instance_name",
+                                       database_username="test_user",
+                                       database_password="test_password")
 
         # assert
         with does_not_raise(ConfigError):
@@ -56,9 +56,9 @@ class TestValidateConfig:
             self, instance_name, database_username, database_password, caplog
     ):
         # arrange
-        mock_config = Config(instance_name=instance_name,
-                             database_username=database_username,
-                             database_password=database_password)
+        mock_config = SqlConfiguration(instance_name=instance_name,
+                                       database_username=database_username,
+                                       database_password=database_password)
 
         validation_service = ValidationService()
 
@@ -84,9 +84,9 @@ class TestValidateConfig:
             self, instance_name, caplog
     ):
         # arrange
-        mock_config = Config(instance_name=instance_name,
-                             database_username="test_user",
-                             database_password="test_password")
+        mock_config = SqlConfiguration(instance_name=instance_name,
+                                       database_username="test_user",
+                                       database_password="test_password")
 
         validation_service = ValidationService()
 
@@ -111,9 +111,9 @@ class TestValidateConfig:
             self, database_username, caplog
     ):
         # arrange
-        mock_config = Config(instance_name="test_instance_name",
-                             database_username=database_username,
-                             database_password="test_password")
+        mock_config = SqlConfiguration(instance_name="test_instance_name",
+                                       database_username=database_username,
+                                       database_password="test_password")
 
         validation_service = ValidationService()
 
@@ -138,9 +138,9 @@ class TestValidateConfig:
             self, database_password, caplog
     ):
         # arrange
-        mock_config = Config(instance_name="test_instance_name",
-                             database_username="test_user",
-                             database_password=database_password)
+        mock_config = SqlConfiguration(instance_name="test_instance_name",
+                                       database_username="test_user",
+                                       database_password=database_password)
 
         validation_service = ValidationService()
 
@@ -156,4 +156,3 @@ class TestValidateConfig:
                    40,
                    error_message,
                ) in caplog.record_tuples
-

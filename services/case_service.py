@@ -1,30 +1,41 @@
 import logging
 
-from providers.configuration_provider import ConfigurationProvider
+from sqlalchemy import text
+
+from services.database_connection_service import DatabaseConnectionService
+
 
 class CaseService:
-    def __init__(self, configuration_provider: ConfigurationProvider) -> None:
-        self._configuration_provider = configuration_provider
+    def __init__(self, database_connection_service: DatabaseConnectionService) -> None:
+        self._database_connection_service = database_connection_service
 
-    def copy_cases(self, source_table: str, destination_table: str) -> tuple[str, int]:
+    def copy_cases(self, questionnaire_name: str) -> tuple[str, int]:
         try:
-            logging.info("Running Cloud Function - 'copy_cases_to_unedited'")
+            logging.info(f"Running Cloud Function - 'copy_cases' for {questionnaire_name}")
+            questionnaire_table_name = f"{questionnaire_name}_Form"
+            unedited_table_name = f"{questionnaire_name}_UNEDITED_Form"
 
-            connection_model = self._configuration_provider.get_database_connection_model()
+            sql_database_engine = self._database_connection_service.get_database()
 
+            with sql_database_engine.connect() as sql_connection:
+                if not sql_database_engine.dialect.has_table(sql_connection, unedited_table_name):
+                    sql_command = text(f"CREATE TABLE {unedited_table_name} \
+                                                LIKE {questionnaire_table_name};")
+                    sql_connection.execute(sql_command)
 
+                sql_command = text(f"INSERT INTO {unedited_table_name} \
+                                                SELECT * from {questionnaire_table_name} \
+                                                WHERE IFNULL(QEdit_edited, 0) <> 1 \
+                                                ON DUPLICATE KEY UPDATE \
+                                                Serial_Number=VALUES(Serial_Number), \
+                                                QEdit_LastUpdated=VALUES(QEdit_LastUpdated), \
+                                                DataStream=VALUES(DataStream);")
+                sql_connection.execute(sql_command)
+                sql_connection.commit()
 
+            logging.info(f"Finished Running Cloud Function - 'copy_cases' for {questionnaire_name}")
 
-            database = DatabaseConnectionService(connection_model).get_database()
-            database_orm_service = DatabaseOrmService()
-            table_name = "unedited_table_name"
+        except Exception as err:
+            return f"Failed to transfer data with the following error: {err}", 500
 
-            if not database_orm_service.check_table_exists(database, table_name):
-                logging.info(f"unedited table not found for {table_name}, creating table")
-
-            logging.info("Finished Running Cloud Function - 'copy_cases_to_unedited'")
-            return f"Successfully copied cases to unedited", 200
-        except (ConfigError, OrmError) as e:
-            error_message = f"Error copying cases to unedited: {e}"
-            logging.error(error_message)
-            return error_message, 400
+        return "Done", 200

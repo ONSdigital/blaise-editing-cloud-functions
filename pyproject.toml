@@ -16,6 +16,7 @@ mypy = "^1.10.0"
 cloud-sql-python-connector = "^1.4.2"
 pymysql = "^1.1.0"
 sqlalchemy = "^2.0.23"
+flask = "^2.0.0"
 
 
 [tool.poetry.group.dev.dependencies]

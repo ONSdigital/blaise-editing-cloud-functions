@@ -1,47 +1,38 @@
 import logging
 
-from google.cloud.sql.connector import IPTypes
+import flask
 
-from appconfig.sql_configuration import Config
-from models.database_connection_model import DatabaseConnectionModel
+from appconfig.sql_configuration import SqlConfiguration
+from providers.configuration_provider import ConfigurationProvider
+from services.case_service import CaseService
 from services.database_connection_service import DatabaseConnectionService
-from services.database_orm_service import DatabaseOrmService
-from utilities.custom_exceptions import ConfigError, OrmError
-from utilities.logging import setup_logger
 from services.validation_service import ValidationService
+from utilities.custom_exceptions import ConfigError
+from utilities.logging import setup_logger
 
 setup_logger()
 
 
-def copy_cases_to_unedited() -> tuple[str, int]:
+def copy_cases_to_unedited(request: flask.request) -> tuple[str, int]:
     try:
         logging.info("Running Cloud Function - 'copy_cases_to_unedited'")
+
+        request_json = request.get_json()
+
+        questionnaire_name = request_json["questionnaire_name"]
+        if questionnaire_name is None or questionnaire_name == "":
+            raise ValueError("Missing required fields: 'questionnaire_name'")
+
         validation_service = ValidationService()
-
-        # Config Handler
-        sql_config = Config.from_env()
-        validation_service.validate_config(sql_config)
-
-        connection_model = DatabaseConnectionModel(
-            instance_name=sql_config.instance_name,
-            database_name="blaise",
-            database_driver="pymysql",
-            database_url="mysql+pymysql://",
-            database_username=sql_config.database_username,
-            database_password=sql_config.database_password,
-            database_ip_connection_type=IPTypes.PUBLIC
-        )
-
-        database = DatabaseConnectionService(connection_model).get_database()
-        database_orm_service = DatabaseOrmService()
-        table_name = "unedited_table_name"
-
-        if not database_orm_service.check_table_exists(database, table_name):
-            logging.info(f"unedited table not found for {table_name}, creating table")
+        sql_configuration = SqlConfiguration.from_env()
+        configuration_provider = ConfigurationProvider(validation_service, sql_configuration)
+        database_connection_service= DatabaseConnectionService(configuration_provider)
+        case_service = CaseService(database_connection_service)
+        case_service.copy_cases(questionnaire_name)
 
         logging.info("Finished Running Cloud Function - 'copy_cases_to_unedited'")
         return f"Successfully copied cases to unedited", 200
-    except (ConfigError, OrmError) as e:
+    except ConfigError as e:
         error_message = f"Error copying cases to unedited: {e}"
         logging.error(error_message)
         return error_message, 400

@@ -1,12 +1,13 @@
 from google.cloud.sql.connector import Connector
 from sqlalchemy import Engine, create_engine
 
-from models.database_connection_model import DatabaseConnectionModel
+from providers.configuration_provider import ConfigurationProvider
 
 
 class DatabaseConnectionService:
-    def __init__(self, connection_model: DatabaseConnectionModel):
-        self._connection_model = connection_model
+    def __init__(self, configuration_provider: ConfigurationProvider):
+        self._configuration_provider = configuration_provider
+        self._connection_model = self._configuration_provider.get_database_connection_model()
 
     def get_database(self) -> Engine:
         return create_engine(
