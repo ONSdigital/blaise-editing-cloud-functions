@@ -1,5 +1,6 @@
+import sqlalchemy
 from google.cloud.sql.connector import Connector
-from sqlalchemy import Engine, create_engine
+from sqlalchemy import Engine
 
 from providers.configuration_provider import ConfigurationProvider
 
@@ -10,7 +11,7 @@ class DatabaseConnectionService:
         self._connection_model = self._configuration_provider.get_database_connection_model()
 
     def get_database(self) -> Engine:
-        return create_engine(
+        return sqlalchemy.create_engine(
             url=self._connection_model.database_url,
             creator=self.get_connector(),
             pool_pre_ping=True
