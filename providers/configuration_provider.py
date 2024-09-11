@@ -11,7 +11,7 @@ class ConfigurationProvider:
         self._sql_configuration = sql_configuration
 
     def get_database_connection_model(self) -> DatabaseConnectionModel:
-        sql_config = self._sql_configuration.from_env()
+        sql_config = self._sql_configuration
         self._validation_service.validate_config(sql_config)
 
         return DatabaseConnectionModel(

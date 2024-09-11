@@ -12,13 +12,12 @@ class DatabaseConnectionService:
     def get_database(self) -> Engine:
         return create_engine(
             url=self._connection_model.database_url,
-            creator=self.__get_connection,
+            creator=self.get_connector(),
             pool_pre_ping=True
         )
 
-    def __get_connection(self) -> Connector:
+    def get_connector(self) -> Connector:
         connector = Connector(self._connection_model.database_ip_connection_type)
-
         return connector.connect(
             instance_connection_string=self._connection_model.instance_name,
             driver=self._connection_model.database_driver,
