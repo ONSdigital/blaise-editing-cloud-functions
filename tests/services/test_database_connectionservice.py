@@ -75,4 +75,5 @@ class TestDatabaseConnectionFunctionality:
 
         # assert
         mock_engine.assert_has_calls(
-            [call(url=connection_model.database_url, creator=service_under_test.get_connector, pool_pre_ping=True)])
+            [call(url=connection_model.database_url, creator=mock_connector(), pool_pre_ping=True)])
+
