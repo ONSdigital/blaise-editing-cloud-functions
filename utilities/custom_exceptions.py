@@ -12,7 +12,7 @@ class ConfigError(Exception):
         return self._format_message()
 
 
-class InputError(Exception):
+class RequestError(Exception):
     def __init__(self, message=None):
         self.message = message
         super().__init__(self._format_message())
@@ -21,6 +21,9 @@ class InputError(Exception):
         if self.message:
             return self.message
         return ""
+
+    def __str__(self):
+        return self._format_message()
 
     def __str__(self):
         return self._format_message()

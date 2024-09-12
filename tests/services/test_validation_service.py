@@ -1,12 +1,13 @@
 from contextlib import contextmanager
 
+import flask
 import pytest
 
 from appconfig.sql_configuration import SqlConfiguration
 from services.validation_service import ValidationService
 from tests.helper import get_default_config
 from utilities.custom_exceptions import (
-    ConfigError,
+    ConfigError, RequestError,
 )
 
 
@@ -27,8 +28,16 @@ def does_not_raise(expected_exception):
         raise AssertionError(f"An unexpected exception {error} raised.")
 
 
-class TestValidateConfig:
-    def test_validate_config_does_not_raise_an_exception_when_given_valid_config(self):
+class MockRequest:
+    def __init__(self, json_data):
+        self.json_data = json_data
+
+    def get_json(self):
+        return self.json_data
+
+
+class TestValidationService:
+    def test_validate_config_is_not_empty_does_not_raise_an_exception_when_given_valid_config(self):
         # arrange
         validation_service = ValidationService()
         mock_config = SqlConfiguration(instance_name="test_instance_name",
@@ -37,7 +46,7 @@ class TestValidateConfig:
 
         # assert
         with does_not_raise(ConfigError):
-            validation_service.validate_config(mock_config)
+            validation_service.validate_config_is_not_empty(mock_config)
 
     @pytest.mark.parametrize(
         "instance_name, database_username, database_password",
@@ -52,7 +61,7 @@ class TestValidateConfig:
             ("", "", ""),
         ],
     )
-    def test_validate_config_logs_and_raises_validation_error_exception_when_all_config_values_are_missing(
+    def test_validate_config_is_not_empty_logs_and_raises_config_error_when_all_config_values_are_missing(
             self, instance_name, database_username, database_password, caplog
     ):
         # arrange
@@ -64,7 +73,7 @@ class TestValidateConfig:
 
         # act
         with pytest.raises(ConfigError) as err:
-            validation_service.validate_config(mock_config)
+            validation_service.validate_config_is_not_empty(mock_config)
 
         # assert
         error_message = \
@@ -80,7 +89,7 @@ class TestValidateConfig:
         "instance_name",
         [None, ""],
     )
-    def test_validate_config_logs_and_raises_validation_error_exception_when_instance_name_is_missing(
+    def test_validate_config_is_not_empty_logs_and_raises_config_error_when_instance_name_is_missing(
             self, instance_name, caplog
     ):
         # arrange
@@ -92,7 +101,7 @@ class TestValidateConfig:
 
         # act
         with pytest.raises(ConfigError) as err:
-            validation_service.validate_config(mock_config)
+            validation_service.validate_config_is_not_empty(mock_config)
 
         # assert
         error_message = "Missing required values from config: ['instance_name']"
@@ -107,7 +116,7 @@ class TestValidateConfig:
         "database_username",
         [None, ""],
     )
-    def test_validate_config_logs_and_raises_validation_error_exception_when_database_username_is_missing(
+    def test_validate_config_is_not_empty_logs_and_raises_config_error_when_database_username_is_missing(
             self, database_username, caplog
     ):
         # arrange
@@ -119,7 +128,7 @@ class TestValidateConfig:
 
         # act
         with pytest.raises(ConfigError) as err:
-            validation_service.validate_config(mock_config)
+            validation_service.validate_config_is_not_empty(mock_config)
 
         # assert
         error_message = "Missing required values from config: ['database_username']"
@@ -134,7 +143,7 @@ class TestValidateConfig:
         "database_password",
         [None, ""],
     )
-    def test_validate_config_logs_and_raises_validation_error_exception_when_database_password_is_missing(
+    def test_validate_config_is_not_empty_logs_and_raises_config_error_when_database_password_is_missing(
             self, database_password, caplog
     ):
         # arrange
@@ -146,10 +155,53 @@ class TestValidateConfig:
 
         # act
         with pytest.raises(ConfigError) as err:
-            validation_service.validate_config(mock_config)
+            validation_service.validate_config_is_not_empty(mock_config)
 
         # assert
         error_message = "Missing required values from config: ['database_password']"
+        assert err.value.args[0] == error_message
+        assert (
+                   "root",
+                   40,
+                   error_message,
+               ) in caplog.record_tuples
+
+    def test_validate_request_values_are_not_empty_does_not_raise_an_exception_when_given_valid_request(
+            self,
+    ):
+        # arrange
+        validation_service = ValidationService()
+        mock_request = flask.Request.from_values(
+            json={"questionnaire_name": "test_questionnaire_name"}
+        )
+
+        # act
+
+        # assert
+        with does_not_raise(RequestError):
+            validation_service.validate_request_values_are_not_empty(
+                mock_request
+            )
+
+    @pytest.mark.parametrize(
+        "questionnaire_name",
+        [None, ""],
+    )
+    def test_validate_request_values_are_not_empty_logs_and_raises_request_error_when_questionnaire_name_is_missing(
+            self, questionnaire_name, caplog
+    ):
+        # arrange
+        validation_service = ValidationService()
+        mock_request = flask.Request.from_values(
+            json={"questionnaire_name": questionnaire_name}
+        )
+
+        # act
+        with pytest.raises(RequestError) as err:
+            validation_service.validate_request_values_are_not_empty(mock_request)
+
+        # assert
+        error_message = "Missing required values from request: ['questionnaire_name']"
         assert err.value.args[0] == error_message
         assert (
                    "root",

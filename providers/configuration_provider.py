@@ -12,7 +12,7 @@ class ConfigurationProvider:
 
     def get_database_connection_model(self) -> DatabaseConnectionModel:
         sql_config = self._sql_configuration
-        self._validation_service.validate_config(sql_config)
+        self._validation_service.validate_config_is_not_empty(sql_config)
 
         return DatabaseConnectionModel(
             instance_name=sql_config.instance_name,

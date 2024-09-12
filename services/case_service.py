@@ -1,6 +1,4 @@
-
-from services.database_connection_service import DatabaseConnectionService
-from tests.services.database_service import DatabaseService
+from services.database_service import DatabaseService
 
 
 class CaseService:
