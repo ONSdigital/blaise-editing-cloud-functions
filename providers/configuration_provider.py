@@ -1,25 +1,33 @@
+import os
+
 from google.cloud.sql.connector import IPTypes
 
-from appconfig.sql_configuration import SqlConfiguration
 from models.database_connection_model import DatabaseConnectionModel
-from services.validation_service import ValidationService
+from utilities.custom_exceptions import ConfigError
 
 
 class ConfigurationProvider:
-    def __init__(self, validation_service: ValidationService, sql_configuration: SqlConfiguration) -> None:
-        self._validation_service = validation_service
-        self._sql_configuration = sql_configuration
 
     def get_database_connection_model(self) -> DatabaseConnectionModel:
-        sql_config = self._sql_configuration
-        self._validation_service.validate_config_is_not_empty(sql_config)
-
         return DatabaseConnectionModel(
-            instance_name=sql_config.instance_name,
+            instance_name=self.build_instance_name(),
             database_name="blaise",
             database_driver="pymysql",
             database_url="mysql+pymysql://",
-            database_username=sql_config.database_username,
-            database_password=sql_config.database_password,
+            database_username=self.get_environment_variable("DATABASE_USERNAME"),
+            database_password=self.get_environment_variable("DATABASE_PASSWORD"),
             database_ip_connection_type=IPTypes.PUBLIC
         )
+
+    def build_instance_name(self) -> str:
+        project_name = self.get_environment_variable("PROJECT_ID")
+        region = self.get_environment_variable("REGION")
+        db_instance_name = self.get_environment_variable("INSTANCE_NAME")
+        return f"{project_name}:{region}:{db_instance_name}"
+
+    @staticmethod
+    def get_environment_variable(variable_name: str) -> str:
+        environment_variable = os.getenv(variable_name, None)
+        if environment_variable is None or environment_variable == "":
+            raise ConfigError(f"Missing environment variable: {variable_name}")
+        return environment_variable

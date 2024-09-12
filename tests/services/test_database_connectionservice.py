@@ -1,51 +1,40 @@
-from unittest.mock import call, patch
+from unittest.mock import call, patch, Mock
 import pytest
 import sqlalchemy
 from google.cloud.sql.connector import Connector, IPTypes
 
-from appconfig.sql_configuration import SqlConfiguration
 from models.database_connection_model import DatabaseConnectionModel
 from providers.configuration_provider import ConfigurationProvider
 from services.database_connection_service import DatabaseConnectionService
-from services.validation_service import ValidationService
-from tests.helper import get_default_config
 
 
 class TestDatabaseConnectionFunctionality:
 
     @pytest.fixture()
-    def validation_service(self) -> ValidationService:
-        return ValidationService()
-
-    @pytest.fixture()
-    def sql_config(self) -> SqlConfiguration:
-        return get_default_config()
-
-    @pytest.fixture()
-    def connection_model(self, sql_config) -> DatabaseConnectionModel:
+    def connection_model(self) -> DatabaseConnectionModel:
         return DatabaseConnectionModel(
-            instance_name=sql_config.instance_name,
+            instance_name="test:test:test",
             database_name="blaise",
             database_driver="pymysql",
             database_url="mysql+pymysql://",
-            database_username=sql_config.database_username,
-            database_password=sql_config.database_password,
+            database_username="test_user",
+            database_password="test_password",
             database_ip_connection_type=IPTypes.PUBLIC
         )
 
     @pytest.fixture()
-    def configuration_provider(self, validation_service, sql_config) -> ConfigurationProvider:
-        return ConfigurationProvider(validation_service, sql_config)
+    def mock_configuration_provider(self):
+        return Mock()
 
     @pytest.fixture()
-    def service_under_test(self, configuration_provider) -> DatabaseConnectionService:
-        return DatabaseConnectionService(configuration_provider)
+    def service_under_test(self, mock_configuration_provider, connection_model) -> DatabaseConnectionService:
+        mock_configuration_provider.get_database_connection_model.return_value = connection_model
+        return DatabaseConnectionService(mock_configuration_provider)
 
     @patch.object(Connector, 'connect')
     def test_get_connector_uses_the_connection_model_to_connect_to_the_database(self,
                                                                                 mock_connector,
                                                                                 service_under_test,
-                                                                                sql_config,
                                                                                 connection_model):
         # arrange
 
