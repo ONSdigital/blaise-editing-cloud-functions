@@ -25,5 +25,3 @@ class RequestError(Exception):
     def __str__(self):
         return self._format_message()
 
-    def __str__(self):
-        return self._format_message()

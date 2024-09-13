@@ -9,7 +9,7 @@ from utilities.logging import setup_logger
 setup_logger()
 
 
-def copy_cases_to_unedited(request: flask.request) -> tuple[str, int]:
+def copy_cases_to_unedited(request) -> tuple[str, int]:
     try:
         logging.info("Running Cloud Function - 'copy_cases_to_unedited'")
 
@@ -17,7 +17,8 @@ def copy_cases_to_unedited(request: flask.request) -> tuple[str, int]:
         validation_service.validate_request_values_are_not_empty(request)
 
         case_service = ServiceInstanceFactory.create_case_service()
-        case_service.copy_cases(request.get_json()["questionnaire_name"])
+        questionnaire_name = request.get_json()["questionnaire_name"]
+        case_service.copy_cases(questionnaire_name)
 
         logging.info("Finished Running Cloud Function - 'copy_cases_to_unedited'")
         return f"Successfully copied cases to unedited", 200

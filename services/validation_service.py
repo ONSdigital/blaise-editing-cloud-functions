@@ -12,7 +12,7 @@ class ValidationService:
         self.request_json = None
 
     @staticmethod
-    def validate_request_values_are_not_empty(request: flask.request):
+    def validate_request_values_are_not_empty(request):
         missing_values = []
         questionnaire_name = request.json["questionnaire_name"]
         if questionnaire_name is None or questionnaire_name == "":
