@@ -47,6 +47,24 @@ jupyter = ["ipython (>=7.8.0)", "tokenize-rt (>=3.2.0)"]
 uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
+name = "blaise-restapi"
+version = "1.0.5"
+description = "Client for calling Blaise RestAPI"
+optional = false
+python-versions = "^3.9"
+files = []
+develop = false
+
+[package.dependencies]
+requests = "^2.26.0"
+
+[package.source]
+type = "git"
+url = "https://github.com/ONSdigital/blaise-api-python-client.git"
+reference = "main"
+resolved_reference = "d374445f9f837b5e34f0c3d540572247ac388190"
+
+[[package]]
 name = "blinker"
 version = "1.8.2"
 description = "Fast, simple object-to-object and broadcast signaling"
@@ -1341,4 +1359,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "692e7729d4f36174c2527a531e18ee4d2afbf65ab2ba68473f4de5ec95ad2d2c"
+content-hash = "840c99c1d08fece35f5d9947f104cb748b709ef48b5fbbfe1ad2403082c00452"

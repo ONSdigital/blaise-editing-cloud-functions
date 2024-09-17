@@ -16,7 +16,7 @@ mypy = "^1.10.0"
 pymysql = "^1.1.0"
 sqlalchemy = "^2.0.23"
 flask = "^2.0.0"
-blaise-restapi = {git = "https://github.com/ONSdigital/blaise-api-python-client", rev = "v1.0.0"}
+blaise-restapi = {git = "https://github.com/ONSdigital/blaise-api-python-client.git", rev = "main"}
 
 
 [tool.poetry.group.dev.dependencies]
