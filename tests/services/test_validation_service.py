@@ -37,7 +37,7 @@ class TestValidationService:
         # arrange
         validation_service = ValidationService()
         mock_request = flask.Request.from_values(
-            json={"questionnaire_name": "test_questionnaire_name"}
+            json={"questionnaire_wildcard": "test_questionnaire_name"}
         )
 
         # act
@@ -49,16 +49,16 @@ class TestValidationService:
             )
 
     @pytest.mark.parametrize(
-        "questionnaire_name",
+        "questionnaire_wildcard",
         [None, ""],
     )
-    def test_validate_request_values_are_not_empty_logs_and_raises_request_error_when_questionnaire_name_is_missing(
-            self, questionnaire_name, caplog
+    def test_validate_request_values_are_not_empty_logs_and_raises_request_error_when_questionnaire_wildcard_is_missing(
+            self, questionnaire_wildcard, caplog
     ):
         # arrange
         validation_service = ValidationService()
         mock_request = flask.Request.from_values(
-            json={"questionnaire_name": questionnaire_name}
+            json={"questionnaire_wildcard": questionnaire_wildcard}
         )
 
         # act
@@ -66,7 +66,7 @@ class TestValidationService:
             validation_service.validate_request_values_are_not_empty(mock_request)
 
         # assert
-        error_message = "Missing required values from request: ['questionnaire_name']"
+        error_message = "Missing required values from request: ['questionnaire_wildcard']"
         assert err.value.args[0] == error_message
         assert (
                    "root",

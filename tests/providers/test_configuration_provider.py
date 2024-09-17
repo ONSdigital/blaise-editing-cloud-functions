@@ -1,8 +1,8 @@
 from contextlib import contextmanager
 
 import pytest
-from google.cloud.sql.connector import IPTypes
 
+from models.blaise_connection_model import BlaiseConnectionModel
 from models.database_connection_model import DatabaseConnectionModel
 from providers.configuration_provider import ConfigurationProvider
 from utilities.custom_exceptions import ConfigError
@@ -64,8 +64,8 @@ class TestConfigurationProvider:
             service_under_test.get_database_connection_model()
 
     def test_get_database_connection_model_raises_config_error_with_database_ip_address_not_set(self,
-                                                                                       monkeypatch,
-                                                                                       service_under_test):
+                                                                                                monkeypatch,
+                                                                                                service_under_test):
         # arrange
         monkeypatch.setenv('DATABASE_USERNAME', 'test_database_username')
         monkeypatch.setenv('DATABASE_PASSWORD', 'test_database_password')
@@ -79,8 +79,8 @@ class TestConfigurationProvider:
         assert err.value.args[0] == error_message
 
     def test_get_database_connection_model_raises_config_error_when_database_ip_address_empty(self,
-                                                                                     monkeypatch,
-                                                                                     service_under_test):
+                                                                                              monkeypatch,
+                                                                                              service_under_test):
         # arrange
         monkeypatch.setenv('DATABASE_IP_ADDRESS', '')
         monkeypatch.setenv('DATABASE_USERNAME', 'test_database_username')
@@ -141,8 +141,8 @@ class TestConfigurationProvider:
         assert err.value.args[0] == error_message
 
     def test_get_database_connection_model_raises_config_error_when_database_password_is_empty(self,
-                                                                                              monkeypatch,
-                                                                                              service_under_test):
+                                                                                               monkeypatch,
+                                                                                               service_under_test):
         # arrange
         monkeypatch.setenv('DATABASE_IP_ADDRESS', '')
         monkeypatch.setenv('DATABASE_USERNAME', 'test_database_username')
@@ -154,4 +154,92 @@ class TestConfigurationProvider:
 
         # assert
         error_message = "Missing environment variable: DATABASE_PASSWORD"
+        assert err.value.args[0] == error_message
+
+    def test_get_blaise_connection_model_returns_expected_result_with_valid_environment_variables(self,
+                                                                                                  monkeypatch,
+                                                                                                  service_under_test):
+        # arrange
+        monkeypatch.setenv('BLAISE_API_URL', 'testBlaise.com')
+        monkeypatch.setenv('BLAISE_SERVER_PARK', 'test_server_park')
+
+        expected_result = BlaiseConnectionModel(
+            blaise_api_url="testBlaise.com",
+            blaise_server_park="test_server_park"
+        )
+
+        # act
+        actual_result = service_under_test.get_blaise_connection_model()
+
+        # assert
+        assert expected_result.blaise_api_url == actual_result.blaise_api_url
+        assert expected_result.blaise_server_park == actual_result.blaise_server_park
+
+    def test_get_blaise_connection_model_does_not_error_with_valid_environment_variables(self,
+                                                                                         monkeypatch,
+                                                                                         service_under_test):
+        # arrange
+        monkeypatch.setenv('BLAISE_API_URL', 'testBlaise.com')
+        monkeypatch.setenv('BLAISE_SERVER_PARK', 'test_server_park')
+
+        # assert
+        with does_not_raise(ConfigError):
+            service_under_test.get_blaise_connection_model()
+
+    def test_get_blaise_connection_model_raises_config_error_with_blaise_api_url_not_set(self,
+                                                                                         monkeypatch,
+                                                                                         service_under_test):
+        # arrange
+        monkeypatch.setenv('BLAISE_SERVER_PARK', 'test_server_park')
+
+        # act
+        with pytest.raises(ConfigError) as err:
+            service_under_test.get_blaise_connection_model()
+
+        # assert
+        error_message = "Missing environment variable: BLAISE_API_URL"
+        assert err.value.args[0] == error_message
+
+    def test_get_blaise_connection_model_raises_config_error_when_blaise_api_url_empty(self,
+                                                                                       monkeypatch,
+                                                                                       service_under_test):
+        # arrange
+        monkeypatch.setenv('BLAISE_API_URL', '')
+        monkeypatch.setenv('BLAISE_SERVER_PARK', 'test_server_park')
+
+        # act
+        with pytest.raises(ConfigError) as err:
+            service_under_test.get_blaise_connection_model()
+
+        # assert
+        error_message = "Missing environment variable: BLAISE_API_URL"
+        assert err.value.args[0] == error_message
+
+    def test_get_blaise_connection_model_raises_config_error_with_blaise_server_park_not_set(self,
+                                                                                             monkeypatch,
+                                                                                             service_under_test):
+        # arrange
+        monkeypatch.setenv('BLAISE_API_URL', 'testBlaise.com')
+
+        # act
+        with pytest.raises(ConfigError) as err:
+            service_under_test.get_blaise_connection_model()
+
+        # assert
+        error_message = "Missing environment variable: BLAISE_SERVER_PARK"
+        assert err.value.args[0] == error_message
+
+    def test_get_blaise_connection_model_raises_config_error_when_blaise_server_park_empty(self,
+                                                                                           monkeypatch,
+                                                                                           service_under_test):
+        # arrange
+        monkeypatch.setenv('BLAISE_API_URL', 'testBlaise.com')
+        monkeypatch.setenv('BLAISE_SERVER_PARK', '')
+
+        # act
+        with pytest.raises(ConfigError) as err:
+            service_under_test.get_blaise_connection_model()
+
+        # assert
+        error_message = "Missing environment variable: BLAISE_SERVER_PARK"
         assert err.value.args[0] == error_message

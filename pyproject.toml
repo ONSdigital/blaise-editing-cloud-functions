@@ -13,10 +13,10 @@ pytest-cov = "^5.0.0"
 codecov = "^2.1.13"
 google-cloud-logging = "^3.10.0"
 mypy = "^1.10.0"
-cloud-sql-python-connector = "^1.4.2"
 pymysql = "^1.1.0"
 sqlalchemy = "^2.0.23"
 flask = "^2.0.0"
+blaise-restapi = {git = "https://github.com/ONSdigital/blaise-api-python-client", rev = "v1.0.0"}
 
 
 [tool.poetry.group.dev.dependencies]
