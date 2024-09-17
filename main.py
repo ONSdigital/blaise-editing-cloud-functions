@@ -1,7 +1,5 @@
 import logging
 
-import flask
-
 from factories.service_instance_factory import ServiceInstanceFactory
 from utilities.custom_exceptions import ConfigError, RequestError, BlaiseError
 from utilities.logging import setup_logger

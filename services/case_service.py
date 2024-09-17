@@ -1,4 +1,5 @@
 import logging
+from typing import Any, Dict, List
 
 from services.blaise_service import BlaiseService
 from services.database_service import DatabaseService
@@ -11,11 +12,8 @@ class CaseService:
 
     def copy_cases(self, questionnaire_wildcard: str):
         questionnaires = self._blaise_service.get_questionnaires()
-        filtered_questionnaires = list(
-            filter(lambda questionnaire: questionnaire["name"].startswith(questionnaire_wildcard),
-                   questionnaires))
 
-        for questionnaire in filtered_questionnaires:
+        for questionnaire in self.filter_questionnaires_by_wildcard(questionnaires, questionnaire_wildcard):
             self.copy_cases_for_questionnaire(questionnaire["name"])
 
     def copy_cases_for_questionnaire(self, questionnaire_name: str):
@@ -28,3 +26,10 @@ class CaseService:
                 self._database_service.create_table(connection, unedited_table_name, questionnaire_table_name)
 
             self._database_service.copy_cases(connection, unedited_table_name, questionnaire_table_name)
+
+    @staticmethod
+    def filter_questionnaires_by_wildcard(questionnaires: List[Dict[str, Any]],
+                                          questionnaire_wildcard: str) -> List[Dict[str, Any]]:
+        return list(
+            filter(lambda questionnaire: questionnaire["name"].startswith(questionnaire_wildcard),
+                   questionnaires))
