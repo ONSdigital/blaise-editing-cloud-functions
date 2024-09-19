@@ -14,9 +14,9 @@ class ValidationService:
     @staticmethod
     def validate_request_values_are_not_empty(request):
         missing_values = []
-        questionnaire_wildcard = request.json["questionnaire_wildcard"]
-        if questionnaire_wildcard is None or questionnaire_wildcard == "":
-            missing_values.append("questionnaire_wildcard")
+        survey_type = request.json["survey_type"]
+        if survey_type is None or survey_type == "":
+            missing_values.append("survey_type")
 
         if missing_values:
             error_message = f"Missing required values from request: {missing_values}"

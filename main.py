@@ -15,7 +15,7 @@ def copy_cases_to_unedited(request) -> tuple[str, int]:
         validation_service.validate_request_values_are_not_empty(request)
 
         case_service = ServiceInstanceFactory.create_case_service()
-        questionnaire_name = request.get_json()["questionnaire_wildcard"]
+        questionnaire_name = request.get_json()["survey_type"]
         case_service.copy_cases(questionnaire_name)
 
         logging.info("Finished Running Cloud Function - 'copy_cases_to_unedited'")

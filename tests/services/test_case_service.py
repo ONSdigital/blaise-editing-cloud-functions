@@ -27,7 +27,7 @@ class TestCaseService:
          "LCF2504A",
          "LCF2505A"],
     )
-    def test_filter_questionnaires_by_wildcard_returns_expected_list_when_given_questionnaire_name(
+    def test_filter_questionnaires_by_survey_type_returns_expected_list_when_given_questionnaire_name(
             self,
             questionnaire_name,
             service_under_test,
@@ -42,12 +42,12 @@ class TestCaseService:
                       {"name": "LCF2505A",
                        "id": "4567"}]
         # act
-        result = service_under_test.filter_questionnaires_by_wildcard(mock_cases, questionnaire_name)
+        result = service_under_test.filter_questionnaires_by_survey_type(mock_cases, questionnaire_name)
 
         # assert
         assert result[0]["name"] == questionnaire_name
 
-    def test_filter_questionnaires_by_wildcard_returns_expected_list_when_given_survey_name(
+    def test_filter_questionnaires_by_survey_type_returns_expected_list_when_given_survey_name(
             self,
             service_under_test,
     ):
@@ -61,7 +61,7 @@ class TestCaseService:
                       {"name": "LCF2505A",
                        "id": "4567"}]
         # act
-        result = service_under_test.filter_questionnaires_by_wildcard(mock_cases, "FRS")
+        result = service_under_test.filter_questionnaires_by_survey_type(mock_cases, "FRS")
 
         # assert
         assert result[0]["name"] == "FRS2504A"

@@ -10,10 +10,10 @@ class CaseService:
         self._database_service = database_service
         self._blaise_service = blaise_service
 
-    def copy_cases(self, questionnaire_wildcard: str):
+    def copy_cases(self, survey_type: str):
         questionnaires = self._blaise_service.get_questionnaires()
 
-        for questionnaire in self.filter_questionnaires_by_wildcard(questionnaires, questionnaire_wildcard):
+        for questionnaire in self.filter_questionnaires_by_survey_type(questionnaires, survey_type):
             self.copy_cases_for_questionnaire(questionnaire["name"])
 
     def copy_cases_for_questionnaire(self, questionnaire_name: str):
@@ -28,8 +28,8 @@ class CaseService:
             self._database_service.copy_cases(connection, unedited_table_name, questionnaire_table_name)
 
     @staticmethod
-    def filter_questionnaires_by_wildcard(questionnaires: List[Dict[str, Any]],
-                                          questionnaire_wildcard: str) -> List[Dict[str, Any]]:
+    def filter_questionnaires_by_survey_type(questionnaires: List[Dict[str, Any]],
+                                             survey_type: str) -> List[Dict[str, Any]]:
         return list(
-            filter(lambda questionnaire: questionnaire["name"].startswith(questionnaire_wildcard),
+            filter(lambda questionnaire: questionnaire["name"].startswith(survey_type),
                    questionnaires))
