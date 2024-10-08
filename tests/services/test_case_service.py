@@ -1,18 +1,37 @@
-from unittest.mock import Mock, patch, call, MagicMock
+from contextlib import contextmanager
+from unittest.mock import Mock, patch, call, MagicMock, ANY
 
 import pytest
 
 from providers.configuration_provider import ConfigurationProvider
 from services.blaise_service import BlaiseService
 from services.case_service import CaseService
+from services.database_connection_service import DatabaseConnectionService
 from services.database_service import DatabaseService
+from utilities.custom_exceptions import CaseError
+
+
+@contextmanager
+def does_not_raise(expected_exception):
+    try:
+        yield
+
+    except expected_exception as error:
+        raise AssertionError(f"Raised exception {error} when it should not!")
+
+    except Exception as error:
+        raise AssertionError(f"An unexpected exception {error} raised.")
 
 
 class TestCaseService:
 
     @pytest.fixture()
-    def mock_database_service(self) -> DatabaseService:
+    def mock_database_connection_service_provider(self) -> DatabaseConnectionService:
         return Mock()
+
+    @pytest.fixture()
+    def mock_database_service(self, mock_database_connection_service_provider) -> DatabaseService:
+        return DatabaseService(mock_database_connection_service_provider)
 
     @pytest.fixture()
     def mock_configuration_provider(self) -> ConfigurationProvider:
@@ -40,17 +59,26 @@ class TestCaseService:
     ):
         # arrange
         mock_cases = [{"name": "FRS2504A",
-                       "id": "1234"},
+                       "id": "1232"},
+                      {"name": "FRS2504A_EDIT",
+                       "id": "1233"},
                       {"name": "FRS2505A",
+                       "id": "2344"},
+                      {"name": "FRS2505A_EDIT",
                        "id": "2345"},
                       {"name": "LCF2504A",
                        "id": "3456"},
+                      {"name": "LCF2504A_EDIT",
+                       "id": "3457"},
                       {"name": "LCF2505A",
-                       "id": "4567"}]
+                       "id": "4568"},
+                      {"name": "LCF2505A_EDIT",
+                       "id": "4569"}]
         # act
         result = service_under_test.filter_questionnaires_by_survey_type(mock_cases, questionnaire_name)
 
         # assert
+        assert len(result) == 1
         assert result[0]["name"] == questionnaire_name
 
     def test_filter_questionnaires_by_survey_type_returns_expected_list_when_given_survey_name(
@@ -59,13 +87,21 @@ class TestCaseService:
     ):
         # arrange
         mock_cases = [{"name": "FRS2504A",
-                       "id": "1234"},
+                       "id": "1232"},
+                      {"name": "FRS2504A_EDIT",
+                       "id": "1233"},
                       {"name": "FRS2505A",
+                       "id": "2344"},
+                      {"name": "FRS2505A_EDIT",
                        "id": "2345"},
                       {"name": "LCF2504A",
                        "id": "3456"},
+                      {"name": "LCF2504A_EDIT",
+                       "id": "3457"},
                       {"name": "LCF2505A",
-                       "id": "4567"}]
+                       "id": "4568"},
+                      {"name": "LCF2505A_EDIT",
+                       "id": "4569"}]
         # act
         result = service_under_test.filter_questionnaires_by_survey_type(mock_cases, "FRS")
 
@@ -84,15 +120,24 @@ class TestCaseService:
     ):
         # arrange
         mock_cases = [{"name": "FRS2504A",
-                       "id": "1234"},
+                       "id": "1232"},
+                      {"name": "FRS2504A_EDIT",
+                       "id": "1233"},
                       {"name": "FRS2505A",
+                       "id": "2344"},
+                      {"name": "FRS2505A_EDIT",
                        "id": "2345"},
                       {"name": "LCF2504A",
                        "id": "3456"},
+                      {"name": "LCF2504A_EDIT",
+                       "id": "3457"},
                       {"name": "LCF2505A",
-                       "id": "4567"}]
+                       "id": "4568"},
+                      {"name": "LCF2505A_EDIT",
+                       "id": "4569"}]
 
         _mock_get_questionnaires.return_value = mock_cases
+
         # act
         service_under_test.copy_cases("FRS")
 
@@ -102,3 +147,72 @@ class TestCaseService:
             [call("FRS2504A"),
              call("FRS2505A")]
         )
+
+    @patch.object(DatabaseService, 'table_exists')
+    @patch.object(DatabaseService, 'database')
+    @patch.object(DatabaseService, 'copy_cases')
+    def test_copy_cases_for_questionnaire_has_call_for_questionnaire(
+            self,
+            _mock_copy_cases,
+            _mock_database,
+            _mock_table_exists,
+            service_under_test,
+    ):
+        # arrange
+        _mock_database.begin().return_value = MagicMock()
+        _mock_table_exists.return_value = True
+
+        # act
+        service_under_test.copy_cases_for_questionnaire("FRS2504A")
+
+        # assert
+        assert _mock_copy_cases.call_count == 1
+        _mock_copy_cases.assert_has_calls(
+            [call(ANY, "FRS2504A_EDIT_Form", "FRS2504A_Form")]
+        )
+
+    @patch.object(DatabaseService, 'table_exists')
+    @patch.object(DatabaseService, 'database')
+    @patch.object(DatabaseService, 'copy_cases')
+    def test_copy_cases_for_questionnaire_does_not_call_an_error_when_edit_table_exists(
+            self,
+            _mock_copy_cases,
+            _mock_database,
+            _mock_table_exists,
+            service_under_test,
+    ):
+        # arrange
+        _mock_database.begin().return_value = MagicMock()
+        _mock_table_exists.return_value = True
+
+        # act & assert
+        with does_not_raise(CaseError):
+            service_under_test.copy_cases_for_questionnaire("FRS2504A")
+
+    @patch.object(DatabaseService, 'table_exists')
+    @patch.object(DatabaseService, 'database')
+    @patch.object(DatabaseService, 'copy_cases')
+    def test_copy_cases_for_questionnaire_raises_case_error_when_edit_table_does_not_exist(
+            self,
+            _mock_copy_cases,
+            _mock_database,
+            _mock_table_exists,
+            service_under_test,
+            caplog
+    ):
+        # arrange
+        _mock_database.begin().return_value = MagicMock()
+        _mock_table_exists.return_value = False
+
+        # act
+        with pytest.raises(CaseError) as err:
+            service_under_test.copy_cases_for_questionnaire("FRS2504A")
+
+        # assert
+        error_message = "Edit questionnaire missing for: 'FRS2504A'"
+        assert err.value.args[0] == error_message
+        assert (
+                   "root",
+                   40,
+                   error_message,
+               ) in caplog.record_tuples
