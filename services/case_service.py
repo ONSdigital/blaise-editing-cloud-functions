@@ -3,7 +3,6 @@ from typing import Any, Dict, List
 
 from services.blaise_service import BlaiseService
 from services.database_service import DatabaseService
-from utilities.custom_exceptions import CaseError
 
 
 class CaseService:
@@ -26,7 +25,7 @@ class CaseService:
             if not self._database_service.table_exists(connection, edit_table_name):
                 error_message = f"Edit questionnaire missing for: '{questionnaire_name}'"
                 logging.error(error_message)
-                raise CaseError(error_message)
+                return
 
             self._database_service.copy_cases(connection, edit_table_name, questionnaire_table_name)
 

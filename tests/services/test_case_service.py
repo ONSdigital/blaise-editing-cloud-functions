@@ -8,7 +8,6 @@ from services.blaise_service import BlaiseService
 from services.case_service import CaseService
 from services.database_connection_service import DatabaseConnectionService
 from services.database_service import DatabaseService
-from utilities.custom_exceptions import CaseError
 
 
 @contextmanager
@@ -151,7 +150,7 @@ class TestCaseService:
     @patch.object(DatabaseService, 'table_exists')
     @patch.object(DatabaseService, 'database')
     @patch.object(DatabaseService, 'copy_cases')
-    def test_copy_cases_for_questionnaire_has_call_for_questionnaire(
+    def test_copy_cases_for_questionnaire_has_call_for_copy_cases(
             self,
             _mock_copy_cases,
             _mock_database,
@@ -174,25 +173,7 @@ class TestCaseService:
     @patch.object(DatabaseService, 'table_exists')
     @patch.object(DatabaseService, 'database')
     @patch.object(DatabaseService, 'copy_cases')
-    def test_copy_cases_for_questionnaire_does_not_call_an_error_when_edit_table_exists(
-            self,
-            _mock_copy_cases,
-            _mock_database,
-            _mock_table_exists,
-            service_under_test,
-    ):
-        # arrange
-        _mock_database.begin().return_value = MagicMock()
-        _mock_table_exists.return_value = True
-
-        # act & assert
-        with does_not_raise(CaseError):
-            service_under_test.copy_cases_for_questionnaire("FRS2504A")
-
-    @patch.object(DatabaseService, 'table_exists')
-    @patch.object(DatabaseService, 'database')
-    @patch.object(DatabaseService, 'copy_cases')
-    def test_copy_cases_for_questionnaire_raises_case_error_when_edit_table_does_not_exist(
+    def test_copy_cases_for_questionnaire_logs_an_error_when_edit_table_does_not_exist(
             self,
             _mock_copy_cases,
             _mock_database,
@@ -205,14 +186,33 @@ class TestCaseService:
         _mock_table_exists.return_value = False
 
         # act
-        with pytest.raises(CaseError) as err:
-            service_under_test.copy_cases_for_questionnaire("FRS2504A")
+        service_under_test.copy_cases_for_questionnaire("FRS2504A")
 
         # assert
         error_message = "Edit questionnaire missing for: 'FRS2504A'"
-        assert err.value.args[0] == error_message
         assert (
                    "root",
                    40,
                    error_message,
                ) in caplog.record_tuples
+
+    @patch.object(DatabaseService, 'table_exists')
+    @patch.object(DatabaseService, 'database')
+    @patch.object(DatabaseService, 'copy_cases')
+    def test_copy_cases_for_questionnaire_does_not_call_copy_cases_when_edit_table_does_not_exist(
+            self,
+            _mock_copy_cases,
+            _mock_database,
+            _mock_table_exists,
+            service_under_test,
+            caplog
+    ):
+        # arrange
+        _mock_database.begin().return_value = MagicMock()
+        _mock_table_exists.return_value = False
+
+        # act
+        service_under_test.copy_cases_for_questionnaire("FRS2504A")
+
+        # assert
+        assert _mock_copy_cases.call_count == 0

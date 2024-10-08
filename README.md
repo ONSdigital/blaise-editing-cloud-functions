@@ -19,6 +19,11 @@ Install dependencies:
 poetry install
 ```
 
+Run MyPy:
+```shell
+poetry run mypy .
+```
+
 Run unit tests:
 ```shell
 poetry run python -m pytest

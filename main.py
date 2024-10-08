@@ -1,7 +1,7 @@
 import logging
 
 from factories.service_instance_factory import ServiceInstanceFactory
-from utilities.custom_exceptions import ConfigError, RequestError, BlaiseError, CaseError
+from utilities.custom_exceptions import ConfigError, RequestError, BlaiseError
 from utilities.logging import setup_logger
 
 setup_logger()
@@ -20,7 +20,7 @@ def copy_cases_to_edit(request) -> tuple[str, int]:
 
         logging.info("Finished Running Cloud Function - 'copy_cases_to_edit'")
         return f"Successfully copied cases to edit", 200
-    except (ConfigError, RequestError, BlaiseError, CaseError) as e:
+    except (ConfigError, RequestError, BlaiseError) as e:
         error_message = f"Error copying cases to edit: {e}"
         logging.error(error_message)
         return error_message, 400
