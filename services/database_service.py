@@ -26,5 +26,7 @@ class DatabaseService:
                     WHERE IFNULL(EDITED.QEdit_edited, 0) <> 1 \
                     ON DUPLICATE KEY UPDATE \
                     Serial_Number = VALUES(Serial_Number), \
+                    QEdit_edited = VALUES( QEdit_edited), \
                     QEdit_LastUpdated = VALUES(QEdit_LastUpdated), \
+                    QHAdmin_HOut = VALUES(QHAdmin_HOut), \
                     DataStream = VALUES(DataStream);")
