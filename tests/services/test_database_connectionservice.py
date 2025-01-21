@@ -41,7 +41,7 @@ class TestDatabaseConnectionFunctionality:
                 host=connection_model.database_ip_address,
                 port=connection_model.database_port,
                 database=connection_model.database_name,
-                query={'ssl_ca': {'key': 'whatever'}},
+                query={'ssl': {'key': 'whatever'}},
             )
 
         # act
