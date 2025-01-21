@@ -17,6 +17,6 @@ class DatabaseConnectionService:
             host=self._connection_model.database_ip_address,
             port=self._connection_model.database_port,
             database=self._connection_model.database_name,
-            query={'ssl_ca': ''},
+            query={'ssl_ca': {'key': 'whatever'}},
         )
         return sqlalchemy.create_engine(url=sql_url)
