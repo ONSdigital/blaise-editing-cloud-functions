@@ -17,6 +17,5 @@ class DatabaseConnectionService:
             host=self._connection_model.database_ip_address,
             port=self._connection_model.database_port,
             database=self._connection_model.database_name,
-            query={'ssl': {'key': 'whatever'}},
         )
-        return sqlalchemy.create_engine(url=sql_url)
+        return sqlalchemy.create_engine(url=sql_url, connect_args={'ssl': {'key': 'whatever'}})
