@@ -18,4 +18,4 @@ class DatabaseConnectionService:
             port=self._connection_model.database_port,
             database=self._connection_model.database_name,
         )
-        return sqlalchemy.create_engine(url=sql_url, connect_args={"Encrypt": False, "TrustServerCertificate": True})
+        return sqlalchemy.create_engine(url=sql_url, connect_args={"TrustServerCertificate": True})

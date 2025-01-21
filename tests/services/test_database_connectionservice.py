@@ -48,6 +48,6 @@ class TestDatabaseConnectionFunctionality:
 
         # assert
         mock_engine.assert_has_calls(
-            [call(url=expected_url, connect_args={"Encrypt": False, "TrustServerCertificate": True})]
+            [call(url=expected_url, connect_args={"TrustServerCertificate": True})]
         )
 
