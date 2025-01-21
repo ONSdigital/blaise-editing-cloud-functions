@@ -41,6 +41,7 @@ class TestDatabaseConnectionFunctionality:
                 host=connection_model.database_ip_address,
                 port=connection_model.database_port,
                 database=connection_model.database_name,
+                query={'ssl_ca': ''},
             )
 
         # act
@@ -48,6 +49,6 @@ class TestDatabaseConnectionFunctionality:
 
         # assert
         mock_engine.assert_has_calls(
-            [call(url=expected_url, connect_args={"TrustServerCertificate": True})]
+            [call(url=expected_url)]
         )
 
