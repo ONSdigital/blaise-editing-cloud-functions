@@ -35,7 +35,9 @@ It needs to be named the same as the "main" questionnaire but with "_EDIT" on th
 
 ## Local Setup
 
-The service cannot be run locally as you cannot locally connect to the SQL instance as Public IP connectivity is disabled.
+The service cannot be run locally, you cannot locally connect to the SQL instance as Public IP connectivity is disabled.  To run this cloud function you need to deploy to a sandbox where you can run it there.
+
+
 To be able to run the tests locally run the following:
 
 Clone the project locally:
