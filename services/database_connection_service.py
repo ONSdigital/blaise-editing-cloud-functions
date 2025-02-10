@@ -11,11 +11,11 @@ class DatabaseConnectionService:
 
     def get_database(self) -> Engine:
         sql_url = URL.create(
-                drivername="mysql+pymysql",
-                username=self._connection_model.database_username,
-                password=self._connection_model.database_password,
-                host=self._connection_model.database_ip_address,
-                port=self._connection_model.database_port,
-                database=self._connection_model.database_name,
-            )
-        return sqlalchemy.create_engine(url=sql_url)
+            drivername="mysql+pymysql",
+            username=self._connection_model.database_username,
+            password=self._connection_model.database_password,
+            host=self._connection_model.database_ip_address,
+            port=self._connection_model.database_port,
+            database=self._connection_model.database_name,
+        )
+        return sqlalchemy.create_engine(url=sql_url, connect_args={'ssl': {'key': 'blaise'}})
