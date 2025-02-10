@@ -9,11 +9,11 @@ class ConfigurationProvider:
 
     def get_database_connection_model(self) -> DatabaseConnectionModel:
         return DatabaseConnectionModel(
-            database_name="blaise",
+            database_name=self.get_environment_variable("DATABASE_NAME"),
             database_username=self.get_environment_variable("DATABASE_USERNAME"),
             database_password=self.get_environment_variable("DATABASE_PASSWORD"),
             database_ip_address=self.get_environment_variable("DATABASE_IP_ADDRESS"),
-            database_port=3306
+            database_port=int(self.get_environment_variable("DATABASE_PORT"))
         )
 
     def get_blaise_connection_model(self) -> BlaiseConnectionModel:
@@ -27,4 +27,6 @@ class ConfigurationProvider:
         environment_variable = os.getenv(variable_name, None)
         if environment_variable is None or environment_variable == "":
             raise ConfigError(f"Missing environment variable: {variable_name}")
+        if variable_name == "DATABASE_PORT" and not environment_variable.isnumeric():
+            raise ConfigError(f"Environment variable {variable_name} must be a number")
         return environment_variable
