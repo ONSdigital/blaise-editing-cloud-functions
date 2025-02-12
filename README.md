@@ -57,12 +57,12 @@ poetry install --no-root
 
 Before pushing code up make sure the following passes:
 
-Run MyPy:
+Run MyPy to check types:
 ```shell
 poetry run mypy .
 ```
 
-Run black:
+Run black to run linting:
 ```shell
 poetry run black .
 ```
