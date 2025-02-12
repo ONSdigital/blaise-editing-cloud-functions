@@ -243,7 +243,15 @@ class TestConfigurationProvider:
         error_message = "Missing environment variable: DATABASE_PORT"
         assert err.value.args[0] == error_message
 
+    @pytest.mark.parametrize(
+        "not_number_port",
+        ["12 34",
+         "not_number",
+         "!£$%",
+         "thirty"],
+    )
     def test_get_database_connection_model_raises_config_error_when_database_port_is_not_a_number(self,
+                                                                                                  not_number_port,
                                                                                                   monkeypatch,
                                                                                                   service_under_test):
         # arrange
@@ -251,7 +259,7 @@ class TestConfigurationProvider:
         monkeypatch.setenv('DATABASE_IP_ADDRESS', '0.0.0.0')
         monkeypatch.setenv('DATABASE_USERNAME', 'test_database_username')
         monkeypatch.setenv('DATABASE_PASSWORD', 'test_database_password')
-        monkeypatch.setenv('DATABASE_PORT', 'test')
+        monkeypatch.setenv('DATABASE_PORT', not_number_port)
 
         # act
         with pytest.raises(ConfigError) as err:
