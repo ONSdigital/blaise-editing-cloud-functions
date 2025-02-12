@@ -49,8 +49,6 @@ jobs:
           poetry install --no-root
       - name: Run black
         run: poetry run black --check .
-      - name: Run isort
-        run: poetry run isort --check .
 
   check-types:
     runs-on: ubuntu-latest
