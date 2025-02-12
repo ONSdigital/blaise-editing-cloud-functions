@@ -19,4 +19,3 @@ class ServiceInstanceFactory:
         database_service = DatabaseService(database_connection_service)
         blaise_service = BlaiseService(configuration_provider)
         return CaseService(database_service, blaise_service)
-

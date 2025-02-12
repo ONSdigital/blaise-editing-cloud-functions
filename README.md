@@ -52,7 +52,7 @@ pip install poetry
 
 Install dependencies:
 ```shell
-poetry install
+poetry install --no-root
 ```
 
 Before pushing code up make sure the following passes:
@@ -60,6 +60,11 @@ Before pushing code up make sure the following passes:
 Run MyPy:
 ```shell
 poetry run mypy .
+```
+
+Run black:
+```shell
+poetry run black .
 ```
 
 Run unit tests:
