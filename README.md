@@ -55,7 +55,7 @@ Install dependencies:
 poetry install --no-root
 ```
 
-Before pushing code up make sure the following passes:
+Before pushing code up make sure all the following passes:
 
 Run MyPy to check types:
 ```shell
