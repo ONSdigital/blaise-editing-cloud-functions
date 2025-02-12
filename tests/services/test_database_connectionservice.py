@@ -1,5 +1,4 @@
 from unittest.mock import call, patch, Mock
-
 import pytest
 import sqlalchemy
 from sqlalchemy import URL
