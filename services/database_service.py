@@ -13,12 +13,20 @@ class DatabaseService:
     def table_exists(self, connection: Connection, table_name: str):
         return self._database_engine.dialect.has_table(connection, table_name)
 
-    def copy_cases(self, connection: Connection, edit_table_name: str, questionnaire_table_name: str):
-        connection.execute(self.copy_cases_command(edit_table_name, questionnaire_table_name))
+    def copy_cases(
+        self,
+        connection: Connection,
+        edit_table_name: str,
+        questionnaire_table_name: str,
+    ):
+        connection.execute(
+            self.copy_cases_command(edit_table_name, questionnaire_table_name)
+        )
 
     @staticmethod
     def copy_cases_command(edit_table_name: str, questionnaire_table_name: str):
-        return text(f"INSERT INTO {edit_table_name} \
+        return text(
+            f"INSERT INTO {edit_table_name} \
                     SELECT UNEDITED.* \
                     FROM {questionnaire_table_name} UNEDITED \
                     LEFT JOIN {edit_table_name}  EDITED \
@@ -29,4 +37,5 @@ class DatabaseService:
                     QEdit_edited = VALUES( QEdit_edited), \
                     QEdit_LastUpdated = VALUES(QEdit_LastUpdated), \
                     QHAdmin_HOut = VALUES(QHAdmin_HOut), \
-                    DataStream = VALUES(DataStream);")
+                    DataStream = VALUES(DataStream);"
+        )

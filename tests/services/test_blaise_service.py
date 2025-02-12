@@ -56,14 +56,17 @@ class TestBlaiseService:
 
     @mock.patch.object(blaise_restapi.Client, "get_all_questionnaires_for_server_park")
     def test_get_questionnaires_returns_a_list_of_dictionaries_containing_questionnaire_info(
-            self,
-            _mock_rest_api_client_get_all_questionnaires_for_server_park,
-            blaise_service,
-            mock_case_1,
-            mock_case_2
+        self,
+        _mock_rest_api_client_get_all_questionnaires_for_server_park,
+        blaise_service,
+        mock_case_1,
+        mock_case_2,
     ):
         # Arrange
-        _mock_rest_api_client_get_all_questionnaires_for_server_park.return_value = [mock_case_1, mock_case_2]
+        _mock_rest_api_client_get_all_questionnaires_for_server_park.return_value = [
+            mock_case_1,
+            mock_case_2,
+        ]
 
         # Act
         result = blaise_service.get_questionnaires()
@@ -84,15 +87,18 @@ class TestBlaiseService:
 
     @mock.patch.object(blaise_restapi.Client, "get_all_questionnaires_for_server_park")
     def test_get_questionnaire_logs_the_correct_information(
-            self,
-            _mock_rest_api_client_get_all_questionnaires_for_server_park,
-            blaise_service,
-            caplog,
-            mock_case_1,
-            mock_case_2
+        self,
+        _mock_rest_api_client_get_all_questionnaires_for_server_park,
+        blaise_service,
+        caplog,
+        mock_case_1,
+        mock_case_2,
     ):
         # Arrange
-        _mock_rest_api_client_get_all_questionnaires_for_server_park.return_value = [mock_case_1, mock_case_2]
+        _mock_rest_api_client_get_all_questionnaires_for_server_park.return_value = [
+            mock_case_1,
+            mock_case_2,
+        ]
 
         # Act
         with caplog.at_level(logging.INFO):
@@ -100,21 +106,21 @@ class TestBlaiseService:
 
         # Assert
         assert (
-                   "root",
-                   logging.INFO,
-                   "Got questionnaires",
-               ) in caplog.record_tuples
+            "root",
+            logging.INFO,
+            "Got questionnaires",
+        ) in caplog.record_tuples
 
     @mock.patch.object(blaise_restapi.Client, "get_all_questionnaires_for_server_park")
     def test_get_questionnaire_logs_error_and_raises_blaise_questionnaire_error_exception(
-            self,
-            mock_rest_api_client_get_all_questionnaires_for_server_park,
-            blaise_service,
-            caplog
+        self,
+        mock_rest_api_client_get_all_questionnaires_for_server_park,
+        blaise_service,
+        caplog,
     ):
         # Arrange
-        mock_rest_api_client_get_all_questionnaires_for_server_park.side_effect = Exception(
-            "DFS had to end their sale"
+        mock_rest_api_client_get_all_questionnaires_for_server_park.side_effect = (
+            Exception("DFS had to end their sale")
         )
 
         # Act
@@ -128,7 +134,7 @@ class TestBlaiseService:
         )
         assert err.value.args[0] == error_message
         assert (
-                   "root",
-                   logging.ERROR,
-                   error_message,
-               ) in caplog.record_tuples
+            "root",
+            logging.ERROR,
+            error_message,
+        ) in caplog.record_tuples

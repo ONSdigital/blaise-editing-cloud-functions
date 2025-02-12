@@ -13,7 +13,7 @@ class ConfigurationProvider:
             database_username=self.get_environment_variable("DATABASE_USERNAME"),
             database_password=self.get_environment_variable("DATABASE_PASSWORD"),
             database_ip_address=self.get_environment_variable("DATABASE_IP_ADDRESS"),
-            database_port=self.get_database_port_environment_variable()
+            database_port=self.get_database_port_environment_variable(),
         )
 
     def get_blaise_connection_model(self) -> BlaiseConnectionModel:

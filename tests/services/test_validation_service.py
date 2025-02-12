@@ -32,7 +32,7 @@ class MockRequest:
 class TestValidationService:
 
     def test_validate_request_values_are_not_empty_does_not_raise_an_exception_when_given_valid_request(
-            self,
+        self,
     ):
         # arrange
         validation_service = ValidationService()
@@ -44,22 +44,18 @@ class TestValidationService:
 
         # assert
         with does_not_raise(RequestError):
-            validation_service.validate_request_values_are_not_empty(
-                mock_request
-            )
+            validation_service.validate_request_values_are_not_empty(mock_request)
 
     @pytest.mark.parametrize(
         "survey_type",
         [None, ""],
     )
     def test_validate_request_values_are_not_empty_logs_and_raises_request_error_when_survey_type_is_missing(
-            self, survey_type, caplog
+        self, survey_type, caplog
     ):
         # arrange
         validation_service = ValidationService()
-        mock_request = flask.Request.from_values(
-            json={"survey_type": survey_type}
-        )
+        mock_request = flask.Request.from_values(json={"survey_type": survey_type})
 
         # act
         with pytest.raises(RequestError) as err:
@@ -69,7 +65,7 @@ class TestValidationService:
         error_message = "Missing required values from request: ['survey_type']"
         assert err.value.args[0] == error_message
         assert (
-                   "root",
-                   40,
-                   error_message,
-               ) in caplog.record_tuples
+            "root",
+            40,
+            error_message,
+        ) in caplog.record_tuples
