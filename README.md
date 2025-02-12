@@ -62,6 +62,11 @@ Run MyPy:
 poetry run mypy .
 ```
 
+Run black:
+```shell
+poetry run black .
+```
+
 Run unit tests:
 ```shell
 poetry run python -m pytest
