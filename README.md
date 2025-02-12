@@ -52,7 +52,7 @@ pip install poetry
 
 Install dependencies:
 ```shell
-poetry install
+poetry install --no-root
 ```
 
 Before pushing code up make sure the following passes:
