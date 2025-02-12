@@ -1,7 +1,7 @@
 import os
 
-from models.blaise_connection_model import BlaiseConnectionModel
 from models.database_connection_model import DatabaseConnectionModel
+from models.blaise_connection_model import BlaiseConnectionModel
 from utilities.custom_exceptions import ConfigError
 
 
@@ -33,6 +33,4 @@ class ConfigurationProvider:
         environment_variable = os.getenv(variable_name, None)
         if environment_variable is None or environment_variable == "":
             raise ConfigError(f"Missing environment variable: {variable_name}")
-        if variable_name == "DATABASE_PORT" and not environment_variable.isnumeric():
-            raise ConfigError(f"Environment variable {variable_name} must be a number")
         return environment_variable
