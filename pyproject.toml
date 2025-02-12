@@ -2,7 +2,7 @@
 name = "blaise-editing-cloud-functions"
 version = "0.1.0"
 description = "A collection of cloud functions related to Blaise Editing Service"
-authors = ["willst1 <thomas.wills@ons.gov.uk>"]
+authors = ["Thomas Wills <62559442+Willst1@users.noreply.github.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
